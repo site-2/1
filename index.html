@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .calc-button {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .calc-button:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-black rounded-3xl p-6 shadow-2xl max-w-sm w-full">
+        <!-- Display -->
+        <div class="bg-gray-800 rounded-2xl p-6 mb-6">
+            <div id="display" class="text-white text-right text-4xl font-light min-h-[60px] flex items-center justify-end overflow-hidden">
+                0
+            </div>
+        </div>
+        
+        <!-- Buttons Grid -->
+        <div class="grid grid-cols-4 gap-3">
+            <!-- Row 1 -->
+            <button class="calc-button bg-gray-600 hover:bg-gray-500 text-white text-xl font-medium h-16 rounded-xl transition-all duration-150" onclick="clearAll()">AC</button>
+            <button class="calc-button bg-gray-600 hover:bg-gray-500 text-white text-xl font-medium h-16 rounded-xl transition-all duration-150" onclick="clearEntry()">C</button>
+            <button class="calc-button bg-gray-600 hover:bg-gray-500 text-white text-xl font-medium h-16 rounded-xl transition-all duration-150" onclick="deleteLast()">⌫</button>
+            <button class="calc-button bg-orange-500 hover:bg-orange-400 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="setOperation('/')">÷</button>
+            
+            <!-- Row 2 -->
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('7')">7</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('8')">8</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('9')">9</button>
+            <button class="calc-button bg-orange-500 hover:bg-orange-400 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="setOperation('*')">×</button>
+            
+            <!-- Row 3 -->
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('4')">4</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('5')">5</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('6')">6</button>
+            <button class="calc-button bg-orange-500 hover:bg-orange-400 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="setOperation('-')">−</button>
+            
+            <!-- Row 4 -->
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('1')">1</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('2')">2</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendNumber('3')">3</button>
+            <button class="calc-button bg-orange-500 hover:bg-orange-400 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="setOperation('+')">+</button>
+            
+            <!-- Row 5 -->
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl col-span-2 transition-all duration-150" onclick="appendNumber('0')">0</button>
+            <button class="calc-button bg-gray-700 hover:bg-gray-600 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="appendDecimal()">,</button>
+            <button class="calc-button bg-orange-500 hover:bg-orange-400 text-white text-2xl font-medium h-16 rounded-xl transition-all duration-150" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script type="module">
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = '';
+        let shouldResetDisplay = false;
+
+        const display = document.getElementById('display');
+
+        function updateDisplay() {
+            const formatted = parseFloat(currentInput).toLocaleString('pt-BR', {
+                maximumFractionDigits: 8,
+                useGrouping: true
+            });
+            display.textContent = formatted;
+        }
+
+        function appendNumber(number) {
+            if (shouldResetDisplay) {
+                currentInput = '';
+                shouldResetDisplay = false;
+            }
+            
+            if (currentInput === '0') {
+                currentInput = number;
+            } else {
+                currentInput += number;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (shouldResetDisplay) {
+                currentInput = '0';
+                shouldResetDisplay = false;
+            }
+            
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+                updateDisplay();
+            }
+        }
+
+        function setOperation(op) {
+            if (operation && !shouldResetDisplay) {
+                calculate();
+            }
+            
+            operation = op;
+            previousInput = currentInput;
+            shouldResetDisplay = true;
+        }
+
+        function calculate() {
+            if (!operation || shouldResetDisplay) return;
+            
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            let result;
+            
+            switch (operation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        alert('Erro: Divisão por zero!');
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            
+            currentInput = result.toString();
+            operation = '';
+            previousInput = '';
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = '0';
+            previousInput = '';
+            operation = '';
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+
+        function clearEntry() {
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        // Expose functions globally
+        window.appendNumber = appendNumber;
+        window.appendDecimal = appendDecimal;
+        window.setOperation = setOperation;
+        window.calculate = calculate;
+        window.clearAll = clearAll;
+        window.clearEntry = clearEntry;
+        window.deleteLast = deleteLast;
+
+        // Keyboard support
+        document.addEventListener('keydown', (e) => {
+            e.preventDefault();
+            
+            if (e.key >= '0' && e.key <= '9') {
+                appendNumber(e.key);
+            } else if (e.key === '.' || e.key === ',') {
+                appendDecimal();
+            } else if (e.key === '+') {
+                setOperation('+');
+            } else if (e.key === '-') {
+                setOperation('-');
+            } else if (e.key === '*') {
+                setOperation('*');
+            } else if (e.key === '/') {
+                setOperation('/');
+            } else if (e.key === 'Enter' || e.key === '=') {
+                calculate();
+            } else if (e.key === 'Escape') {
+                clearAll();
+            } else if (e.key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // Initial display update
+        updateDisplay();
+    </script>
+</body>
+</html>
