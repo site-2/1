@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Emulador Embedado</title>
+    <style>
+        /* Define o tamanho do container do jogo */
+        .game-container {
+            width: 640px;
+            height: 480px;
+            max-width: 100%;
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Container onde o emulador será renderizado -->
+    <div class="game-container">
+        <div id="game"></div>
+    </div>
+
+    <!-- Script de configuração do EmulatorJS -->
+    <script>
+        // Substitua pelas informações do seu jogo
+        EJS_player = '#game';
+        EJS_core = 'snes'; // Sistema do jogo (ex: snes, megadrive, gba, nes)
+        EJS_gameName = 'Super Mario World'; // Nome que aparecerá na tela de carregamento
+        EJS_biosUrl = ''; // Opcional (apenas se o sistema exigir BIOS, como PS1)
+        
+        // LINK DA SUA ROM: Pode ser um link direto do seu servidor ou Google Drive
+        EJS_gameUrl = 'SuperMarioWorld.sfc'; 
+
+        // Caminho para os arquivos de sistema do EmulatorJS
+        EJS_pathtodata = 'https://emulatorjs.org';
+    </script>
+
+    <!-- Inicializador do emulador -->
+    <script src="https://emulatorjs.orgloader.js"></script>
+
+</body>
+</html>
